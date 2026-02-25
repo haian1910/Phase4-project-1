@@ -5,32 +5,19 @@ import redis
 from PIL import Image
 
 app = FastAPI()
-
 # Redis connection
-REDIS_HOST = "172.31.15.56"
+REDIS_HOST = "172.31.15.xx"
 r = redis.Redis(host=REDIS_HOST, port=6379, decode_responses=True)
-
-
-# =============================
-# Request Models
-# =============================
-
 class PixelRequest(BaseModel):
     x: int
     y: int
     channel: Literal["R", "G", "B"]
     value: int
-
-
 class BuildRequest(BaseModel):
     width: int
     height: int
 
-
-# =============================
 # Receive Pixel
-# =============================
-
 @app.post("/pixel")
 def receive_pixel(data: PixelRequest):
     if not (0 <= data.value <= 255):
@@ -42,20 +29,13 @@ def receive_pixel(data: PixelRequest):
     return {"status": "ok"}
 
 
-# =============================
-# Refresh Redis (Clear all)
-# =============================
-
+# Refresh Redis
 @app.post("/refresh",include_in_schema=False)
 def refresh_redis():
     r.flushdb()
     return {"status": "redis cleared"}
 
-
-# =============================
 # Build Image
-# =============================
-
 @app.post("/build",include_in_schema=False)
 def build_image(data: BuildRequest):
 
